@@ -41,7 +41,8 @@ namespace DatEditor
             if (listView.SelectedItems.Count > 0)
             {
                 ListViewItem item = listView.SelectedItems[0];
-                Remove(item);
+                FileEntry file = FileEntries[item.Index];
+                Remove(file);
             }
         }
         private void button_extract_Click(object sender, EventArgs e)
@@ -124,19 +125,29 @@ namespace DatEditor
         public void OpenDat(BinaryReader br)
         {
             ClearDat();
-            int totalCount;
+            uint totalCount;
             int i;
+            byte[] fileNameBytes = new byte[13];
 
-            totalCount = br.ReadInt32();
+            totalCount = br.ReadUInt32();
+            Console.WriteLine("totalCount is " + totalCount);
             FileEntries = new FileEntry[(totalCount - 1)];
 
             for (i = 0; i < (totalCount - 1); i++)
             {
                 FileEntries[i].StartAddress = br.ReadUInt32();
-                string name = new string(br.ReadChars(13));
+                fileNameBytes = br.ReadBytes(13);
+                string name = System.Text.Encoding.Default.GetString(fileNameBytes);
                 FileEntries[i].Filename = name;
                 FileEntries[i].EndAddress = br.ReadUInt32();
+                
                 FileEntries[i].Filesize = FileEntries[i].EndAddress - FileEntries[i].StartAddress;
+                Console.WriteLine("-------BEGIN FILE " + (i+1) + "-------");
+                Console.WriteLine("StartAddress is " + FileEntries[i].StartAddress);
+                Console.WriteLine("Filename is " + FileEntries[i].Filename);
+                Console.WriteLine("End address is " + FileEntries[i].EndAddress);
+                Console.WriteLine("Filesize is " + FileEntries[i].Filesize);
+                Console.WriteLine("-------END FILE " + (i + 1) + "-------");
                 br.BaseStream.Seek(-4, SeekOrigin.Current);
             }
 
@@ -179,9 +190,9 @@ namespace DatEditor
             bw.Close();
         }
 
-        public void Remove(ListViewItem item)
+        public void Remove(FileEntry file)
         {
-            FileEntry file = FileEntries[item.Index];
+            
             FileEntry[] newfiles = new FileEntry[(FileEntries.Count()-1)];
             int j = 0;
             for (int i = 0; i < FileEntries.Count(); i++)
