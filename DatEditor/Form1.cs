@@ -130,7 +130,6 @@ namespace DatEditor
             byte[] fileNameBytes = new byte[13];
 
             totalCount = br.ReadUInt32();
-            Console.WriteLine("totalCount is " + totalCount);
             FileEntries = new FileEntry[(totalCount - 1)];
 
             for (i = 0; i < (totalCount - 1); i++)
@@ -142,12 +141,6 @@ namespace DatEditor
                 FileEntries[i].EndAddress = br.ReadUInt32();
                 
                 FileEntries[i].Filesize = FileEntries[i].EndAddress - FileEntries[i].StartAddress;
-                Console.WriteLine("-------BEGIN FILE " + (i+1) + "-------");
-                Console.WriteLine("StartAddress is " + FileEntries[i].StartAddress);
-                Console.WriteLine("Filename is " + FileEntries[i].Filename);
-                Console.WriteLine("End address is " + FileEntries[i].EndAddress);
-                Console.WriteLine("Filesize is " + FileEntries[i].Filesize);
-                Console.WriteLine("-------END FILE " + (i + 1) + "-------");
                 br.BaseStream.Seek(-4, SeekOrigin.Current);
             }
 
